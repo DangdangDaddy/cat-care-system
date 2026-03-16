@@ -1,0 +1,254 @@
+{
+  "cats": [
+    {
+      "name": "当当",
+      "gender": "female",
+      "gender_display": "母",
+      "breed": "曼基康银渐层",
+      "birth_date": "2025-11-10",
+      "neutered": false,
+      "weight_records": [
+        {
+          "date": "2026-01-04",
+          "weight": 825,
+          "unit": "g"
+        },
+        {
+          "date": "2026-01-08",
+          "weight": 901,
+          "unit": "g"
+        },
+        {
+          "date": "2026-01-10",
+          "weight": 910,
+          "unit": "g"
+        },
+        {
+          "date": "2026-01-11",
+          "weight": 920,
+          "unit": "g"
+        },
+        {
+          "date": "2026-01-12",
+          "weight": 957,
+          "unit": "g"
+        },
+        {
+          "date": "2026-01-14",
+          "weight": 960,
+          "unit": "g"
+        },
+        {
+          "date": "2026-01-17",
+          "weight": 1027,
+          "unit": "g"
+        },
+        {
+          "date": "2026-01-20",
+          "weight": 1050,
+          "unit": "g"
+        },
+        {
+          "date": "2026-01-21",
+          "weight": 1081,
+          "unit": "g"
+        },
+        {
+          "date": "2026-01-24",
+          "weight": 1103,
+          "unit": "g"
+        },
+        {
+          "date": "2026-01-27",
+          "weight": 1073,
+          "unit": "g"
+        },
+        {
+          "date": "2026-01-29",
+          "weight": 1124,
+          "unit": "g"
+        },
+        {
+          "date": "2026-01-31",
+          "weight": 1189,
+          "unit": "g"
+        },
+        {
+          "date": "2026-02-03",
+          "weight": 1200,
+          "unit": "g"
+        },
+        {
+          "date": "2026-02-04",
+          "weight": 1212,
+          "unit": "g"
+        },
+        {
+          "date": "2026-02-08",
+          "weight": 1297,
+          "unit": "g"
+        },
+        {
+          "date": "2026-02-13",
+          "weight": 1335,
+          "unit": "g"
+        },
+        {
+          "date": "2026-02-26",
+          "weight": 1401,
+          "unit": "g"
+        },
+        {
+          "date": "2026-03-01",
+          "weight": 1474,
+          "unit": "g"
+        },
+        {
+          "date": "2026-03-03",
+          "weight": 1480,
+          "unit": "g"
+        },
+        {
+          "date": "2026-03-06",
+          "weight": 1494,
+          "unit": "g"
+        },
+        {
+          "date": "2026-03-09",
+          "weight": 1572,
+          "unit": "g"
+        },
+        {
+          "date": "2026-03-12",
+          "weight": 1524,
+          "unit": "g"
+        }
+      ]
+    },
+    {
+      "name": "可乐",
+      "gender": "male",
+      "gender_display": "公",
+      "breed": "英短金渐层",
+      "birth_date": "2025-11-10",
+      "neutered": false,
+      "weight_records": [
+        {
+          "date": "2026-01-04",
+          "weight": 795,
+          "unit": "g"
+        },
+        {
+          "date": "2026-01-08",
+          "weight": 905,
+          "unit": "g"
+        },
+        {
+          "date": "2026-01-10",
+          "weight": 941,
+          "unit": "g"
+        },
+        {
+          "date": "2026-01-11",
+          "weight": 975,
+          "unit": "g"
+        },
+        {
+          "date": "2026-01-12",
+          "weight": 1005,
+          "unit": "g"
+        },
+        {
+          "date": "2026-01-14",
+          "weight": 1054,
+          "unit": "g"
+        },
+        {
+          "date": "2026-01-17",
+          "weight": 1100,
+          "unit": "g"
+        },
+        {
+          "date": "2026-01-20",
+          "weight": 1141,
+          "unit": "g"
+        },
+        {
+          "date": "2026-01-21",
+          "weight": 1170,
+          "unit": "g"
+        },
+        {
+          "date": "2026-01-24",
+          "weight": 1250,
+          "unit": "g"
+        },
+        {
+          "date": "2026-01-27",
+          "weight": 1313,
+          "unit": "g"
+        },
+        {
+          "date": "2026-01-29",
+          "weight": 1386,
+          "unit": "g"
+        },
+        {
+          "date": "2026-01-31",
+          "weight": 1414,
+          "unit": "g"
+        },
+        {
+          "date": "2026-02-03",
+          "weight": 1461,
+          "unit": "g"
+        },
+        {
+          "date": "2026-02-04",
+          "weight": 1500,
+          "unit": "g"
+        },
+        {
+          "date": "2026-02-08",
+          "weight": 1613,
+          "unit": "g"
+        },
+        {
+          "date": "2026-02-13",
+          "weight": 1708,
+          "unit": "g"
+        },
+        {
+          "date": "2026-02-26",
+          "weight": 1766,
+          "unit": "g"
+        },
+        {
+          "date": "2026-03-01",
+          "weight": 1829,
+          "unit": "g"
+        },
+        {
+          "date": "2026-03-03",
+          "weight": 1894,
+          "unit": "g"
+        },
+        {
+          "date": "2026-03-06",
+          "weight": 2018,
+          "unit": "g"
+        },
+        {
+          "date": "2026-03-09",
+          "weight": 2120,
+          "unit": "g"
+        },
+        {
+          "date": "2026-03-12",
+          "weight": 2170,
+          "unit": "g"
+        }
+      ]
+    }
+  ]
+}
