@@ -4,7 +4,7 @@ from fastapi.staticfiles import StaticFiles
 from pathlib import Path
 from database import engine
 import models
-from routers import auth, cats, weights
+from routers import auth, cats, weights, medical_history, photos, albums
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -21,6 +21,9 @@ app.add_middleware(
 app.include_router(auth.router)
 app.include_router(cats.router)
 app.include_router(weights.router)
+app.include_router(medical_history.router)
+app.include_router(photos.router)
+app.include_router(albums.router)
 
 # 挂载静态文件目录（用于头像等）
 static_dir = Path(__file__).parent / "static"
