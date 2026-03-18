@@ -27,6 +27,13 @@ def update_cat(cat_id: int, cat: schemas.CatCreate, db: Session = Depends(get_db
     db.commit()
     return db_cat
 
+@router.get("/{cat_id}", response_model=schemas.Cat)
+def get_cat(cat_id: int, db: Session = Depends(get_db)):
+    db_cat = db.query(models.Cat).filter(models.Cat.id == cat_id).first()
+    if not db_cat:
+        raise HTTPException(status_code=404, detail="猫咪不存在")
+    return db_cat
+
 @router.delete("/{cat_id}")
 def delete_cat(cat_id: int, db: Session = Depends(get_db)):
     db_cat = db.query(models.Cat).filter(models.Cat.id == cat_id).first()

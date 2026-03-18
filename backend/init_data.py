@@ -80,3 +80,6 @@ def init_data():
         print(f"初始化数据失败: {e}")
     finally:
         db.close()
+
+if __name__ == "__main__":
+    init_data()

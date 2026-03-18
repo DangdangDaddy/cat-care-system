@@ -1,17 +1,16 @@
 import axios from 'axios'
-import { useUserStore } from '../stores/user'
 
 const api = axios.create({
   baseURL: '/api',
   timeout: 10000
 })
 
-// 请求拦截器
+// 请求拦截器 - 直接从 localStorage 读取
 api.interceptors.request.use(
   (config) => {
-    const userStore = useUserStore()
-    if (userStore.token) {
-      config.headers.Authorization = `Bearer ${userStore.token}`
+    const token = localStorage.getItem('token')
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`
     }
     return config
   },
@@ -22,11 +21,12 @@ api.interceptors.request.use(
 
 // 响应拦截器
 api.interceptors.response.use(
-  (response) => response,
+  (response) => response.data,  // 直接返回 data，简化调用
   (error) => {
     if (error.response?.status === 401) {
-      const userStore = useUserStore()
-      userStore.logout()
+      localStorage.removeItem('token')
+      localStorage.removeItem('userId')
+      localStorage.removeItem('username')
       window.location.href = '/login'
     }
     return Promise.reject(error)
@@ -47,6 +47,8 @@ export const authApi = {
 export const catApi = {
   getCats: (userId: number) => 
     api.get('/cats/', { params: { user_id: userId } }),
+  getCat: (catId: number) => 
+    api.get(`/cats/${catId}`),
   createCat: (userId: number, data: any) => 
     api.post('/cats/', data, { params: { user_id: userId } }),
   updateCat: (catId: number, data: any) => 

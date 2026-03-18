@@ -1,5 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from pathlib import Path
 from database import engine
 import models
 from routers import auth, cats, weights
@@ -19,6 +21,11 @@ app.add_middleware(
 app.include_router(auth.router)
 app.include_router(cats.router)
 app.include_router(weights.router)
+
+# 挂载静态文件目录（用于头像等）
+static_dir = Path(__file__).parent / "static"
+static_dir.mkdir(exist_ok=True)
+app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
 
 @app.get("/")
 def root():
