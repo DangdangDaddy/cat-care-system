@@ -15,82 +15,152 @@
     </header>
 
     <main class="dashboard-content">
-      <h2 class="section-title">
-        <el-icon><StarFilled /></el-icon>
-        我的猫咪
-      </h2>
-      
-      <div class="cat-grid">
-        <div 
-          v-for="cat in cats" 
-          :key="cat.id" 
-          class="cat-card"
-          @click="goToCatDetail(cat.id)"
-        >
-          <div class="cat-card-header">
-            <div class="cat-avatar">
-              <img v-if="cat.avatar" :src="cat.avatar" :alt="cat.name" />
-              <span v-else>{{ cat.gender === 'female' ? '🐱' : '😺' }}</span>
+      <!-- 页签切换 -->
+      <el-tabs v-model="activeTab" class="main-tabs">
+        <!-- 我的猫咪页签 -->
+        <el-tab-pane label="我的猫咪" name="cats">
+          <h2 class="section-title">
+            <el-icon><StarFilled /></el-icon>
+            我的猫咪
+          </h2>
+          
+          <div class="cat-grid">
+            <div 
+              v-for="cat in cats" 
+              :key="cat.id" 
+              class="cat-card"
+              @click="goToCatDetail(cat.id)"
+            >
+              <div class="cat-card-header">
+                <div class="cat-avatar">
+                  <img v-if="cat.avatar" :src="cat.avatar" :alt="cat.name" />
+                  <span v-else>{{ cat.gender === 'female' ? '🐱' : '😺' }}</span>
+                </div>
+                <div class="cat-info">
+                  <h3>{{ cat.name }}</h3>
+                  <p>{{ getBreedDisplay(cat.breed, cat.color) }}</p>
+                </div>
+              </div>
+              <div class="cat-details">
+                <p>
+                  <span>性别：</span>
+                  <span>{{ cat.gender === 'female' ? '母猫' : '公猫' }}</span>
+                </p>
+                <p>
+                  <span>生日：</span>
+                  <span>{{ cat.birth_date }}</span>
+                </p>
+                <p>
+                  <span>绝育：</span>
+                  <span>{{ cat.neutered ? '已绝育' : '未绝育' }}</span>
+                </p>
+                <p v-if="cat.color">
+                  <span>毛色：</span>
+                  <span>{{ cat.color }}</span>
+                </p>
+                <p v-if="cat.vaccination_status">
+                  <span>疫苗：</span>
+                  <span :class="getVaccinationClass(cat.vaccination_status)">
+                    {{ cat.vaccination_status }}
+                  </span>
+                </p>
+              </div>
             </div>
-            <div class="cat-info">
-              <h3>{{ cat.name }}</h3>
-              <p>{{ cat.breed }}</p>
+            
+            <div class="add-cat-card" @click="showAddDialog = true">
+              <el-icon class="icon"><Plus /></el-icon>
+              <span>添加猫咪</span>
             </div>
           </div>
-          <div class="cat-details">
-            <p>
-              <span>性别：</span>
-              <span>{{ cat.gender === 'female' ? '母猫' : '公猫' }}</span>
-            </p>
-            <p>
-              <span>生日：</span>
-              <span>{{ cat.birth_date }}</span>
-            </p>
-            <p>
-              <span>绝育：</span>
-              <span>{{ cat.neutered ? '已绝育' : '未绝育' }}</span>
-            </p>
-          </div>
-        </div>
-        
-        <div class="add-cat-card" @click="showAddDialog = true">
-          <el-icon class="icon"><Plus /></el-icon>
-          <span>添加猫咪</span>
-        </div>
-      </div>
 
-      <div class="chart-section">
-        <h2 class="section-title">
-          <el-icon><TrendCharts /></el-icon>
-          体重趋势
-        </h2>
-        <div class="chart-container" ref="chartRef"></div>
-      </div>
+          <div class="chart-section">
+            <h2 class="section-title">
+              <el-icon><TrendCharts /></el-icon>
+              体重趋势
+            </h2>
+            <div class="chart-container" ref="chartRef"></div>
+          </div>
+        </el-tab-pane>
+
+        <!-- 相册页签 -->
+        <el-tab-pane label="相册" name="album">
+          <h2 class="section-title">
+            <el-icon><PictureFilled /></el-icon>
+            猫咪相册
+          </h2>
+          
+          <div class="album-container" v-if="allPhotos.length > 0">
+            <div 
+              class="photo-item" 
+              v-for="(photo, index) in shuffledPhotos" 
+              :key="index"
+              @click="viewPhoto(photo)"
+            >
+              <img :src="photo.url" :alt="photo.catName" />
+              <div class="photo-overlay">
+                <span class="cat-name">{{ photo.catName }}</span>
+              </div>
+            </div>
+          </div>
+          
+          <el-empty v-else description="暂无猫咪照片" />
+        </el-tab-pane>
+      </el-tabs>
     </main>
 
     <!-- 添加猫咪对话框 -->
-    <el-dialog v-model="showAddDialog" title="添加猫咪" width="500px">
-      <el-form :model="catForm" :rules="catRules" ref="catFormRef" label-width="80px">
+    <el-dialog v-model="showAddDialog" title="添加猫咪" width="600px">
+      <el-form :model="catForm" :rules="catRules" ref="catFormRef" label-width="100px">
         <el-form-item label="名字" prop="name">
           <el-input v-model="catForm.name" placeholder="请输入猫咪名字" />
         </el-form-item>
+        
         <el-form-item label="性别" prop="gender">
           <el-radio-group v-model="catForm.gender">
             <el-radio label="male">公猫</el-radio>
             <el-radio label="female">母猫</el-radio>
           </el-radio-group>
         </el-form-item>
+        
         <el-form-item label="品种" prop="breed">
           <el-select v-model="catForm.breed" placeholder="请选择品种" style="width: 100%">
             <el-option label="英短蓝猫" value="英短蓝猫" />
-            <el-option label="美短" value="美短" />
+            <el-option label="英短金渐层" value="英短金渐层" />
+            <el-option label="英短银渐层" value="英短银渐层" />
+            <el-option label="美短虎斑" value="美短虎斑" />
+            <el-option label="美短起司猫" value="美短起司猫" />
             <el-option label="橘猫" value="橘猫" />
             <el-option label="布偶猫" value="布偶猫" />
             <el-option label="暹罗猫" value="暹罗猫" />
-            <el-option label="田园猫" value="田园猫" />
-            <el-option label="其他" value="其他" />
+            <el-option label="缅因猫" value="缅因猫" />
+            <el-option label="波斯猫" value="波斯猫" />
+            <el-option label="折耳猫" value="折耳猫" />
+            <el-option label="加菲猫" value="加菲猫" />
+            <el-option label="无毛猫（斯芬克斯）" value="无毛猫" />
+            <el-option label="田园猫（狸花猫）" value="田园猫" />
+            <el-option label="其他品种" value="其他" />
           </el-select>
         </el-form-item>
+        
+        <el-form-item label="毛色" prop="color">
+          <el-select v-model="catForm.color" placeholder="请选择毛色" style="width: 100%">
+            <el-option label="白色" value="白色" />
+            <el-option label="黑色" value="黑色" />
+            <el-option label="灰色/蓝灰色" value="灰色" />
+            <el-option label="橘色/黄色" value="橘色" />
+            <el-option label="虎斑纹" value="虎斑纹" />
+            <el-option label="三花（白+黑+橘）" value="三花" />
+            <el-option label="玳瑁色" value="玳瑁色" />
+            <el-option label="奶牛猫（黑白）" value="奶牛猫" />
+            <el-option label="重点色（暹罗色）" value="重点色" />
+            <el-option label="金渐层" value="金渐层" />
+            <el-option label="银渐层" value="银渐层" />
+            <el-option label="奶油色" value="奶油色" />
+            <el-option label="巧克力色/棕色" value="巧克力色" />
+            <el-option label="其他颜色" value="其他" />
+          </el-select>
+        </el-form-item>
+        
         <el-form-item label="生日" prop="birth_date">
           <el-date-picker 
             v-model="catForm.birth_date" 
@@ -100,8 +170,39 @@
             value-format="YYYY-MM-DD"
           />
         </el-form-item>
+        
         <el-form-item label="是否绝育">
           <el-switch v-model="catForm.neutered" />
+        </el-form-item>
+        
+        <el-divider content-position="left">健康信息</el-divider>
+        
+        <el-form-item label="疫苗接种">
+          <el-select v-model="catForm.vaccination_status" placeholder="请选择疫苗接种情况" style="width: 100%">
+            <el-option label="未接种" value="未接种" />
+            <el-option label="接种中" value="接种中" />
+            <el-option label="已完成基础免疫" value="已完成基础免疫" />
+            <el-option label="定期接种中" value="定期接种中" />
+          </el-select>
+        </el-form-item>
+        
+        <el-form-item label="驱虫日期">
+          <el-date-picker 
+            v-model="catForm.deworming_date" 
+            type="date" 
+            placeholder="选择最近驱虫日期"
+            style="width: 100%"
+            value-format="YYYY-MM-DD"
+          />
+        </el-form-item>
+        
+        <el-form-item label="病史记录">
+          <el-input 
+            v-model="catForm.medical_history" 
+            type="textarea" 
+            :rows="3"
+            placeholder="请输入猫咪病史记录（如有）"
+          />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -109,14 +210,19 @@
         <el-button type="primary" :loading="addingCat" @click="handleAddCat">确定</el-button>
       </template>
     </el-dialog>
+
+    <!-- 照片预览对话框 -->
+    <el-dialog v-model="showPhotoDialog" width="80%" :title="selectedPhoto?.catName">
+      <img v-if="selectedPhoto" :src="selectedPhoto.url" style="width: 100%;" />
+    </el-dialog>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, onUnmounted } from 'vue'
+import { ref, reactive, onMounted, onUnmounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { StarFilled, Plus, TrendCharts, SwitchButton } from '@element-plus/icons-vue'
+import { StarFilled, Plus, TrendCharts, SwitchButton, PictureFilled } from '@element-plus/icons-vue'
 import * as echarts from 'echarts'
 import { catApi, weightApi } from '../api'
 import { useUserStore } from '../stores/user'
@@ -134,13 +240,21 @@ const chartRef = ref<HTMLElement>()
 const showAddDialog = ref(false)
 const catFormRef = ref()
 const addingCat = ref(false)
+const activeTab = ref('cats')
+const showPhotoDialog = ref(false)
+const selectedPhoto = ref<{ url: string; catName: string } | null>(null)
 
+// 猫咪表单
 const catForm = reactive({
   name: '',
   gender: 'male',
   breed: '',
+  color: '',
   birth_date: '',
-  neutered: false
+  neutered: false,
+  vaccination_status: '',
+  deworming_date: '',
+  medical_history: ''
 })
 
 const catRules = {
@@ -150,9 +264,95 @@ const catRules = {
   birth_date: [{ required: true, message: '请选择生日', trigger: 'change' }]
 }
 
+// 收集所有猫咪照片
+const allPhotos = computed(() => {
+  const photos: { url: string; catName: string; catId: number }[] = []
+  cats.value.forEach(cat => {
+    if (cat.avatar) {
+      photos.push({
+        url: cat.avatar,
+        catName: cat.name,
+        catId: cat.id
+      })
+    }
+    if (cat.photos && Array.isArray(cat.photos)) {
+      cat.photos.forEach((photo: string) => {
+        photos.push({
+          url: photo,
+          catName: cat.name,
+          catId: cat.id
+        })
+      })
+    }
+  })
+  return photos
+})
+
+// 随机打乱照片
+const shuffledPhotos = computed(() => {
+  const photos = [...allPhotos.value]
+  for (let i = photos.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[photos[i], photos[j]] = [photos[j], photos[i]]
+  }
+  return photos
+})
+
+// 品种智能匹配展示
+function getBreedDisplay(breed: string, color: string | undefined): string {
+  if (!breed) return '未知品种'
+  
+  const breedColorMap: Record<string, Record<string, string>> = {
+    '英短蓝猫': { '灰色': '英短蓝猫', '默认': '英短蓝猫' },
+    '英短金渐层': { '金渐层': '英短金渐层', '默认': '英短金渐层' },
+    '英短银渐层': { '银渐层': '英短银渐层', '默认': '英短银渐层' },
+    '美短虎斑': { '虎斑纹': '美短虎斑', '默认': '美短虎斑' },
+    '美短起司猫': { '奶牛猫': '美短起司', '默认': '美短起司猫' },
+    '橘猫': { '橘色': '橘猫', '默认': '橘猫' },
+    '布偶猫': { '重点色': '布偶猫', '奶油色': '布偶猫', '默认': '布偶猫' },
+    '暹罗猫': { '重点色': '暹罗猫', '默认': '暹罗猫' },
+    '田园猫': {
+      '橘色': '橘猫（田园）',
+      '虎斑纹': '狸花猫',
+      '三花': '三花猫',
+      '玳瑁色': '玳瑁猫',
+      '奶牛猫': '奶牛猫',
+      '默认': '田园猫'
+    }
+  }
+  
+  if (breedColorMap[breed] && color && breedColorMap[breed][color]) {
+    return breedColorMap[breed][color]
+  }
+  
+  if (color && color !== '其他') {
+    return `${breed}（${color}）`
+  }
+  
+  return breed
+}
+
+// 疫苗状态样式
+function getVaccinationClass(status: string): string {
+  switch (status) {
+    case '已完成基础免疫':
+    case '定期接种中':
+      return 'vaccination-complete'
+    case '接种中':
+      return 'vaccination-progress'
+    default:
+      return 'vaccination-none'
+  }
+}
+
+// 查看照片
+function viewPhoto(photo: { url: string; catName: string }) {
+  selectedPhoto.value = photo
+  showPhotoDialog.value = true
+}
+
 async function loadCats() {
   try {
-    // 直接从 localStorage 读取 userId，避免 userStore 初始化问题
     const userId = Number(localStorage.getItem('userId'))
     if (!userId) {
       ElMessage.error('请重新登录')
@@ -174,7 +374,6 @@ async function loadChart() {
     
     if (!chartRef.value) return
     
-    // 销毁之前的实例（如果存在）
     const existingChart = echarts.getInstanceByDom(chartRef.value)
     if (existingChart) {
       existingChart.dispose()
@@ -182,20 +381,15 @@ async function loadChart() {
     
     const chart = echarts.init(chartRef.value)
     
-    // 过滤掉没有数据的猫咪
     const validData = res.filter((item: any) => item.data && item.data.length > 0)
     
-    // 如果没有数据，显示提示
     if (validData.length === 0) {
       chart.setOption({
         title: {
           text: '暂无体重数据',
           left: 'center',
           top: 'center',
-          textStyle: {
-            color: '#999',
-            fontSize: 16
-          }
+          textStyle: { color: '#999', fontSize: 16 }
         }
       })
       return
@@ -238,48 +432,52 @@ async function loadChart() {
       },
       xAxis: {
         type: 'time',
-        axisLabel: {
-          formatter: '{MM}-{dd}'
-        }
+        boundaryGap: false
       },
       yAxis: {
         type: 'value',
-        name: '体重 (克)',
-        axisLabel: {
-          formatter: '{value}g'
-        }
+        name: '体重(g)',
+        axisLine: { show: true }
       },
       series
     })
     
-    const resizeHandler = () => chart.resize()
-    window.addEventListener('resize', resizeHandler)
-    
-    // 保存 resize handler 以便卸载时移除
-    ;(chart as any)._resizeHandler = resizeHandler
+    const handleResize = () => chart.resize()
+    window.addEventListener('resize', handleResize)
   } catch (error) {
-    console.error('加载图表失败', error)
+    ElMessage.error('加载图表失败')
   }
 }
 
 async function handleAddCat() {
-  await catFormRef.value.validate()
-  addingCat.value = true
-  
   try {
+    await catFormRef.value.validate()
+    addingCat.value = true
     const userId = Number(localStorage.getItem('userId'))
-    if (!userId) {
-      ElMessage.error('请重新登录')
-      return
-    }
-    await catApi.createCat(userId, catForm)
-    ElMessage.success('添加成功！')
+    
+    await catApi.addCat({
+      ...catForm,
+      user_id: userId
+    })
+    
+    ElMessage.success('添加成功')
     showAddDialog.value = false
-    catFormRef.value.resetFields()
-    await loadCats()
-    await loadChart()
-  } catch (error: any) {
-    ElMessage.error(error.response?.data?.detail || '添加失败')
+    
+    // 重置表单
+    catForm.name = ''
+    catForm.gender = 'male'
+    catForm.breed = ''
+    catForm.color = ''
+    catForm.birth_date = ''
+    catForm.neutered = false
+    catForm.vaccination_status = ''
+    catForm.deworming_date = ''
+    catForm.medical_history = ''
+    
+    loadCats()
+    loadChart()
+  } catch (error) {
+    ElMessage.error('添加失败')
   } finally {
     addingCat.value = false
   }
@@ -291,25 +489,12 @@ function goToCatDetail(catId: number) {
 
 function handleLogout() {
   userStore.logout()
-  window.location.href = '/login'
+  router.push('/login')
 }
 
 onMounted(() => {
   loadCats()
   loadChart()
-})
-
-onUnmounted(() => {
-  // 清理 ECharts 实例
-  if (chartRef.value) {
-    const chart = echarts.getInstanceByDom(chartRef.value)
-    if (chart) {
-      if ((chart as any)._resizeHandler) {
-        window.removeEventListener('resize', (chart as any)._resizeHandler)
-      }
-      chart.dispose()
-    }
-  }
 })
 </script>
 
@@ -317,78 +502,89 @@ onUnmounted(() => {
 .dashboard-container {
   min-height: 100vh;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px;
 }
 
 .dashboard-header {
-  background: rgba(255, 255, 255, 0.95);
-  padding: 20px 40px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  padding: 16px 24px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  margin-bottom: 24px;
 }
 
 .dashboard-header h1 {
-  margin: 0;
-  font-size: 24px;
-  color: #333;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
+  margin: 0;
+  font-size: 24px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .dashboard-content {
-  padding: 30px 40px;
-  max-width: 1200px;
-  margin: 0 auto;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.main-tabs {
+  margin-bottom: 20px;
 }
 
 .section-title {
-  color: white;
-  font-size: 20px;
-  margin-bottom: 20px;
   display: flex;
   align-items: center;
   gap: 8px;
+  margin: 0 0 20px 0;
+  font-size: 20px;
+  color: #333;
 }
 
 .cat-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 20px;
-  margin-bottom: 40px;
+  margin-bottom: 32px;
 }
 
 .cat-card {
-  background: white;
+  background: linear-gradient(145deg, #f8f9ff, #ffffff);
   border-radius: 16px;
   padding: 20px;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  border: 2px solid transparent;
 }
 
 .cat-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 30px rgba(102, 126, 234, 0.2);
+  border-color: #667eea;
 }
 
 .cat-card-header {
   display: flex;
   align-items: center;
-  gap: 15px;
-  margin-bottom: 15px;
+  gap: 16px;
+  margin-bottom: 16px;
 }
 
 .cat-avatar {
-  width: 60px;
-  height: 60px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  width: 64px;
+  height: 64px;
   border-radius: 50%;
+  background: linear-gradient(135deg, #667eea, #764ba2);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 30px;
+  font-size: 28px;
   overflow: hidden;
 }
 
@@ -405,71 +601,122 @@ onUnmounted(() => {
 }
 
 .cat-info p {
-  margin: 5px 0 0;
-  color: #666;
+  margin: 4px 0 0;
   font-size: 14px;
+  color: #666;
 }
 
 .cat-details {
-  border-top: 1px solid #eee;
-  padding-top: 15px;
+  font-size: 14px;
 }
 
 .cat-details p {
   margin: 8px 0;
-  font-size: 14px;
-  color: #666;
+  display: flex;
+  justify-content: space-between;
 }
 
 .cat-details span:first-child {
   color: #999;
 }
 
+.cat-details span:last-child {
+  color: #333;
+  font-weight: 500;
+}
+
+.vaccination-complete {
+  color: #67c23a !important;
+}
+
+.vaccination-progress {
+  color: #e6a23c !important;
+}
+
+.vaccination-none {
+  color: #f56c6c !important;
+}
+
 .add-cat-card {
-  background: rgba(255, 255, 255, 0.9);
-  border: 2px dashed rgba(255, 255, 255, 0.5);
-  border-radius: 16px;
-  padding: 40px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  min-height: 200px;
+  background: rgba(102, 126, 234, 0.1);
+  border: 2px dashed #667eea;
+  border-radius: 16px;
   cursor: pointer;
   transition: all 0.3s ease;
-  min-height: 200px;
+  color: #667eea;
 }
 
 .add-cat-card:hover {
-  background: white;
-  border-color: #667eea;
+  background: rgba(102, 126, 234, 0.2);
+  transform: scale(1.02);
 }
 
 .add-cat-card .icon {
-  font-size: 40px;
-  color: #667eea;
-  margin-bottom: 10px;
-}
-
-.add-cat-card span {
-  color: #666;
-  font-size: 16px;
+  font-size: 48px;
+  margin-bottom: 12px;
 }
 
 .chart-section {
-  background: white;
-  border-radius: 16px;
-  padding: 25px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-}
-
-.chart-section .section-title {
-  color: #333;
-  margin-bottom: 20px;
+  margin-top: 32px;
 }
 
 .chart-container {
-  width: 100%;
   height: 350px;
-  min-height: 350px;
+  background: #f8f9ff;
+  border-radius: 12px;
+}
+
+/* 相册样式 */
+.album-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.photo-item {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.photo-item:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.photo-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.photo-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 12px;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.photo-item:hover .photo-overlay {
+  opacity: 1;
+}
+
+.cat-name {
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
 }
 </style>
