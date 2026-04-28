@@ -17,12 +17,12 @@ class CatBase(BaseModel):
     name: str
     gender: str
     breed: str
-    coat_color: Optional[str] = None
+    color: Optional[str] = None  # 毛色 (前端使用 color)
     birth_date: date
     neutered: bool = False
     vaccination_status: Optional[str] = None
-    last_internal_deworming: Optional[date] = None
-    last_external_deworming: Optional[date] = None
+    deworming_date: Optional[date] = None  # 驱虫日期
+    medical_history: Optional[str] = None  # 病史记录
     avatar: Optional[str] = None
 
 class CatCreate(CatBase):
@@ -32,12 +32,12 @@ class CatUpdate(BaseModel):
     name: Optional[str] = None
     gender: Optional[str] = None
     breed: Optional[str] = None
-    coat_color: Optional[str] = None
+    color: Optional[str] = None
     birth_date: Optional[date] = None
     neutered: Optional[bool] = None
     vaccination_status: Optional[str] = None
-    last_internal_deworming: Optional[date] = None
-    last_external_deworming: Optional[date] = None
+    deworming_date: Optional[date] = None
+    medical_history: Optional[str] = None
     avatar: Optional[str] = None
 
 class Cat(CatBase):
@@ -49,6 +49,7 @@ class Cat(CatBase):
 class WeightRecordBase(BaseModel):
     date: date
     weight: float
+    note: Optional[str] = None
 
 class WeightRecordCreate(WeightRecordBase):
     pass
@@ -56,6 +57,7 @@ class WeightRecordCreate(WeightRecordBase):
 class WeightRecordUpdate(BaseModel):
     date: Optional[date] = None
     weight: Optional[float] = None
+    note: Optional[str] = None
 
 class WeightRecord(WeightRecordBase):
     id: int

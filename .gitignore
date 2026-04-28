@@ -1,31 +1,72 @@
 # Python
 __pycache__/
 *.py[cod]
+*$py.class
 *.so
 .Python
 venv/
-.venv/
 ENV/
-*.db
+env/
+.venv/
 
 # Node
 node_modules/
-dist/
-.npm
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
-# IDE
-.idea/
-.vscode/
-*.swp
+# Database
+*.db
+*.sqlite
+*.sqlite3
 
 # OS
 .DS_Store
 Thumbs.db
 
-# Logs
-*.log
-logs/
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
 
-# Env
+# Environment
 .env
 .env.local
+.env.*.local
+
+# Logs
+logs/
+*.log
+
+# Build
+dist/
+build/
+*.egg-info/
+
+# OpenClaw workspace files (not part of the project)
+AGENTS.md
+HEARTBEAT.md
+IDENTITY.md
+MEMORY.md
+PROJECTS.md
+SOUL.md
+TOOLS.md
+USER.md
+.openclaw/
+codex/
+codex-training/
+data/
+fastapi-crud-sync/
+fastapi_sqlalchemy/
+framework-learning/
+full-stack-fastapi-template/
+import_weights.py
+memory/
+package-lock.json
+projects/
+push-cat-care.sh
+state/
+cat_care.db
+cat-care-changelog.md
+cat-care-iteration2-template.md

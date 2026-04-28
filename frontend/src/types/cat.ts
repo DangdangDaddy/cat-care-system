@@ -3,10 +3,14 @@ export interface Cat {
   owner_id: number
   name: string
   breed: string
+  color?: string  // 毛色
   gender: string
   birth_date: string
   neutered: boolean
   avatar?: string
+  vaccination_status?: string
+  deworming_date?: string
+  medical_history?: string
   created_at?: string
 }
 

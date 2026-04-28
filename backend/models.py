@@ -16,12 +16,12 @@ class Cat(Base):
     name = Column(String, index=True)
     gender = Column(String)  # male/female
     breed = Column(String)  # 品种
-    coat_color = Column(String, nullable=True)  # 毛色
+    color = Column(String, nullable=True)  # 毛色
     birth_date = Column(Date)
     neutered = Column(Boolean, default=False)
     vaccination_status = Column(String, nullable=True)  # 疫苗接种状态
-    last_internal_deworming = Column(Date, nullable=True)  # 最近体内驱虫
-    last_external_deworming = Column(Date, nullable=True)  # 最近体外驱虫
+    deworming_date = Column(Date, nullable=True)  # 驱虫日期
+    medical_history = Column(Text, nullable=True)  # 病史记录
     avatar = Column(String, nullable=True)
     owner_id = Column(Integer, ForeignKey("users.id"))
     owner = relationship("User", back_populates="cats")
@@ -36,6 +36,7 @@ class WeightRecord(Base):
     cat_id = Column(Integer, ForeignKey("cats.id"))
     date = Column(Date)
     weight = Column(Float)  # 单位：克
+    note = Column(Text, nullable=True)  # 备注
     cat = relationship("Cat", back_populates="weights")
 
 class MedicalHistory(Base):

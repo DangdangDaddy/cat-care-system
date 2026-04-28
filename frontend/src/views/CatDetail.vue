@@ -101,10 +101,32 @@
           <div class="weight-section">
             <div class="weight-header">
               <h3>体重记录</h3>
-              <el-button type="primary" @click="showWeightDialog = true">
-                <el-icon><Plus /></el-icon>
-                添加记录
-              </el-button>
+              <div class="weight-actions">
+                <el-button type="primary" @click="showWeightDialog = true">
+                  <el-icon><Plus /></el-icon>
+                  添加记录
+                </el-button>
+                <el-button @click="handleDownloadTemplate">
+                  <el-icon><Download /></el-icon>
+                  下载模板
+                </el-button>
+                <el-upload
+                  :show-file-list="false"
+                  :before-upload="beforeImportUpload"
+                  :http-request="handleImportWeights"
+                  accept=".xlsx,.xls"
+                  class="inline-upload"
+                >
+                  <el-button type="success">
+                    <el-icon><Upload /></el-icon>
+                    导入数据
+                  </el-button>
+                </el-upload>
+                <el-button type="warning" @click="handleExportWeights">
+                  <el-icon><Download /></el-icon>
+                  导出数据
+                </el-button>
+              </div>
             </div>
 
             <div class="weight-chart" ref="weightChartRef"></div>
@@ -115,14 +137,16 @@
               <el-table-column prop="note" label="备注" />
               <el-table-column label="操作" width="150">
                 <template #default="{ row }">
-                  <el-button type="primary" size="small" text @click="editWeightRecord(row)">
-                    <el-icon><Edit /></el-icon>
-                    编辑
-                  </el-button>
-                  <el-button type="danger" size="small" text @click="deleteWeightRecord(row.id)">
-                    <el-icon><Delete /></el-icon>
-                    删除
-                  </el-button>
+                  <div style="display: flex; gap: 8px;">
+                    <el-button type="primary" size="small" text @click="editWeightRecord(row)">
+                      <el-icon><Edit /></el-icon>
+                      编辑
+                    </el-button>
+                    <el-button type="danger" size="small" text @click="deleteWeightRecord(row.id)">
+                      <el-icon><Delete /></el-icon>
+                      删除
+                    </el-button>
+                  </div>
                 </template>
               </el-table-column>
             </el-table>
@@ -190,42 +214,82 @@
         </el-form-item>
         
         <el-form-item label="品种" prop="breed">
-          <el-select v-model="editForm.breed" placeholder="请选择品种" style="width: 100%">
-            <el-option label="英短蓝猫" value="英短蓝猫" />
-            <el-option label="英短金渐层" value="英短金渐层" />
-            <el-option label="英短银渐层" value="英短银渐层" />
-            <el-option label="美短虎斑" value="美短虎斑" />
-            <el-option label="美短起司猫" value="美短起司猫" />
-            <el-option label="橘猫" value="橘猫" />
+          <el-select 
+            v-model="editForm.breed" 
+            placeholder="请选择品种" 
+            style="width: 100%"
+            @change="handleBreedChange"
+          >
+            <el-option label="英国短毛猫" value="英国短毛猫" />
+            <el-option label="美国短毛猫" value="美国短毛猫" />
             <el-option label="布偶猫" value="布偶猫" />
-            <el-option label="暹罗猫" value="暹罗猫" />
             <el-option label="缅因猫" value="缅因猫" />
             <el-option label="波斯猫" value="波斯猫" />
-            <el-option label="折耳猫" value="折耳猫" />
-            <el-option label="加菲猫" value="加菲猫" />
-            <el-option label="无毛猫（斯芬克斯）" value="无毛猫" />
-            <el-option label="田园猫（狸花猫）" value="田园猫" />
-            <el-option label="其他品种" value="其他" />
+            <el-option label="加菲猫（异国短毛猫）" value="加菲猫" />
+            <el-option label="孟加拉豹猫" value="孟加拉豹猫" />
+            <el-option label="斯芬克斯猫（无毛猫）" value="斯芬克斯猫" />
+            <el-option label="挪威森林猫" value="挪威森林猫" />
+            <el-option label="德文卷毛猫" value="德文卷毛猫" />
+            <el-option label="俄罗斯蓝猫" value="俄罗斯蓝猫" />
+            <el-option label="阿比西尼亚猫" value="阿比西尼亚猫" />
+            <el-option label="苏格兰折耳猫" value="苏格兰折耳猫" />
+            <el-option label="曼基康猫（矮脚猫）" value="曼基康猫" />
+            <el-option label="拿破仑猫（矮脚长毛猫）" value="拿破仑猫" />
+            <el-option label="西伯利亚猫" value="西伯利亚猫" />
+            <el-option label="索马里猫" value="索马里猫" />
+            <el-option label="暹罗猫" value="暹罗猫" />
+            <el-option label="金吉拉猫" value="金吉拉猫" />
+            <el-option label="中国狸花猫" value="中国狸花猫" />
+            <el-option label="中华田园猫" value="中华田园猫" />
+            <el-option label="其他（支持手工录入）" value="其他" />
           </el-select>
+          <el-input 
+            v-if="editForm.breed === '其他'" 
+            v-model="editForm.breed_custom" 
+            placeholder="请输入品种名称"
+            style="margin-top: 8px;"
+          />
         </el-form-item>
         
         <el-form-item label="毛色" prop="color">
-          <el-select v-model="editForm.color" placeholder="请选择毛色" style="width: 100%">
+          <el-select 
+            v-model="editForm.color" 
+            placeholder="请选择毛色" 
+            style="width: 100%"
+            @change="handleColorChange"
+          >
             <el-option label="白色" value="白色" />
             <el-option label="黑色" value="黑色" />
-            <el-option label="灰色/蓝灰色" value="灰色" />
-            <el-option label="橘色/黄色" value="橘色" />
-            <el-option label="虎斑纹" value="虎斑纹" />
-            <el-option label="三花（白+黑+橘）" value="三花" />
-            <el-option label="玳瑁色" value="玳瑁色" />
-            <el-option label="奶牛猫（黑白）" value="奶牛猫" />
-            <el-option label="重点色（暹罗色）" value="重点色" />
-            <el-option label="金渐层" value="金渐层" />
-            <el-option label="银渐层" value="银渐层" />
+            <el-option label="蓝色" value="蓝色" />
+            <el-option label="红色" value="红色" />
             <el-option label="奶油色" value="奶油色" />
-            <el-option label="巧克力色/棕色" value="巧克力色" />
-            <el-option label="其他颜色" value="其他" />
+            <el-option label="巧克力色" value="巧克力色" />
+            <el-option label="银渐层" value="银渐层" />
+            <el-option label="金渐层" value="金渐层" />
+            <el-option label="蓝金渐层" value="蓝金渐层" />
+            <el-option label="蓝银渐层" value="蓝银渐层" />
+            <el-option label="银虎斑" value="银虎斑" />
+            <el-option label="金虎斑" value="金虎斑" />
+            <el-option label="棕虎斑" value="棕虎斑" />
+            <el-option label="蓝虎斑" value="蓝虎斑" />
+            <el-option label="红虎斑" value="红虎斑" />
+            <el-option label="海豹重点色" value="海豹重点色" />
+            <el-option label="蓝重点色" value="蓝重点色" />
+            <el-option label="巧克力重点色" value="巧克力重点色" />
+            <el-option label="火焰重点色" value="火焰重点色" />
+            <el-option label="玳瑁色" value="玳瑁色" />
+            <el-option label="三花色" value="三花色" />
+            <el-option label="双色" value="双色" />
+            <el-option label="烟色" value="烟色" />
+            <el-option label="纯色" value="纯色" />
+            <el-option label="其他（支持手工录入）" value="其他" />
           </el-select>
+          <el-input 
+            v-if="editForm.color === '其他'" 
+            v-model="editForm.color_custom" 
+            placeholder="请输入毛色名称"
+            style="margin-top: 8px;"
+          />
         </el-form-item>
         
         <el-form-item label="生日" prop="birth_date">
@@ -325,10 +389,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, computed } from 'vue'
+import { ref, reactive, onMounted, computed, nextTick, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { ArrowLeft, Edit, Delete, Plus, FirstAidKit } from '@element-plus/icons-vue'
+import { ArrowLeft, Edit, Delete, Plus, FirstAidKit, Download, Upload } from '@element-plus/icons-vue'
 import * as echarts from 'echarts'
 import { catApi, weightApi } from '../api'
 
@@ -354,13 +418,29 @@ const editForm = reactive({
   name: '',
   gender: 'male',
   breed: '',
+  breed_custom: '',  // 自定义品种
   color: '',
+  color_custom: '',  // 自定义毛色
   birth_date: '',
   neutered: false,
   vaccination_status: '',
   deworming_date: '',
   medical_history: ''
 })
+
+// 品种选择变化处理
+function handleBreedChange(value: string) {
+  if (value !== '其他') {
+    editForm.breed_custom = ''
+  }
+}
+
+// 毛色选择变化处理
+function handleColorChange(value: string) {
+  if (value !== '其他') {
+    editForm.color_custom = ''
+  }
+}
 
 const weightForm = reactive({
   record_date: '',
@@ -377,37 +457,16 @@ const latestWeight = computed(() => {
   return weightRecords.value[0].weight
 })
 
-// 品种智能匹配展示
+// 品种和毛色展示（用 · 分隔）
 function getBreedDisplay(breed: string, color: string | undefined): string {
   if (!breed) return '未知品种'
   
-  const breedColorMap: Record<string, Record<string, string>> = {
-    '英短蓝猫': { '灰色': '英短蓝猫', '默认': '英短蓝猫' },
-    '英短金渐层': { '金渐层': '英短金渐层', '默认': '英短金渐层' },
-    '英短银渐层': { '银渐层': '英短银渐层', '默认': '英短银渐层' },
-    '美短虎斑': { '虎斑纹': '美短虎斑', '默认': '美短虎斑' },
-    '美短起司猫': { '奶牛猫': '美短起司', '默认': '美短起司猫' },
-    '橘猫': { '橘色': '橘猫', '默认': '橘猫' },
-    '布偶猫': { '重点色': '布偶猫', '奶油色': '布偶猫', '默认': '布偶猫' },
-    '暹罗猫': { '重点色': '暹罗猫', '默认': '暹罗猫' },
-    '田园猫': {
-      '橘色': '橘猫（田园）',
-      '虎斑纹': '狸花猫',
-      '三花': '三花猫',
-      '玳瑁色': '玳瑁猫',
-      '奶牛猫': '奶牛猫',
-      '默认': '田园猫'
-    }
-  }
-  
-  if (breedColorMap[breed] && color && breedColorMap[breed][color]) {
-    return breedColorMap[breed][color]
-  }
-  
+  // 如果有毛色，显示 品种 · 毛色
   if (color && color !== '其他') {
-    return `${breed}（${color}）`
+    return `${breed} · ${color}`
   }
   
+  // 如果没有毛色或毛色是"其他"，只显示品种
   return breed
 }
 
@@ -458,7 +517,9 @@ async function loadCatDetail() {
     editForm.name = res.name
     editForm.gender = res.gender
     editForm.breed = res.breed || ''
+    editForm.breed_custom = ''  // 重置自定义品种
     editForm.color = res.color || ''
+    editForm.color_custom = ''  // 重置自定义毛色
     editForm.birth_date = res.birth_date
     editForm.neutered = res.neutered
     editForm.vaccination_status = res.vaccination_status || ''
@@ -479,7 +540,11 @@ async function loadWeightRecords() {
   try {
     const catId = route.params.id as string
     const res = await weightApi.getRecords(Number(catId))
-    weightRecords.value = res.sort((a: any, b: any) => 
+    // 后端返回 date 字段，前端使用 record_date
+    weightRecords.value = res.map((r: any) => ({
+      ...r,
+      record_date: r.date || r.record_date
+    })).sort((a: any, b: any) => 
       new Date(b.record_date).getTime() - new Date(a.record_date).getTime()
     )
     renderWeightChart()
@@ -489,6 +554,39 @@ async function loadWeightRecords() {
 }
 
 function renderWeightChart() {
+  // 使用 nextTick 确保 DOM 已更新
+  nextTick(() => {
+    if (!weightChartRef.value) {
+      console.log('Chart container not found')
+      return
+    }
+    if (weightRecords.value.length === 0) {
+      console.log('No weight records to display')
+      return
+    }
+    
+    // 检查容器是否有有效尺寸
+    const rect = weightChartRef.value.getBoundingClientRect()
+    if (rect.width === 0 || rect.height === 0) {
+      // 使用 ResizeObserver 等待容器变为可见
+      const resizeObserver = new ResizeObserver((entries) => {
+        for (const entry of entries) {
+          if (entry.contentRect.width > 0 && entry.contentRect.height > 0) {
+            resizeObserver.disconnect()
+            // 容器现在有尺寸，渲染图表
+            doRenderChart()
+          }
+        }
+      })
+      resizeObserver.observe(weightChartRef.value)
+      return
+    }
+    
+    doRenderChart()
+  })
+}
+
+function doRenderChart() {
   if (!weightChartRef.value || weightRecords.value.length === 0) return
   
   const existingChart = echarts.getInstanceByDom(weightChartRef.value)
@@ -538,13 +636,28 @@ function renderWeightChart() {
       itemStyle: { color: '#667eea' }
     }]
   })
+  
+  // 窗口大小变化时重新调整图表
+  const handleResize = () => chart.resize()
+  window.addEventListener('resize', handleResize)
 }
 
 async function handleSaveEdit() {
   try {
     saving.value = true
     const catId = route.params.id as string
-    await catApi.updateCat(Number(catId), editForm)
+    
+    // 处理自定义品种和毛色
+    const submitData = {
+      ...editForm,
+      breed: editForm.breed === '其他' ? editForm.breed_custom : editForm.breed,
+      color: editForm.color === '其他' ? editForm.color_custom : editForm.color
+    }
+    // 移除临时字段
+    delete (submitData as any).breed_custom
+    delete (submitData as any).color_custom
+    
+    await catApi.updateCat(Number(catId), submitData)
     ElMessage.success('保存成功')
     showEditDialog.value = false
     loadCatDetail()
@@ -577,7 +690,7 @@ async function handleDeleteCat() {
 // 编辑体重记录
 function editWeightRecord(record: any) {
   editingWeightId.value = record.id
-  weightForm.record_date = record.record_date
+  weightForm.record_date = record.date || record.record_date  // 兼容两种字段名
   weightForm.weight = record.weight
   weightForm.note = record.note || ''
   showWeightDialog.value = true
@@ -607,15 +720,22 @@ async function handleAddWeight() {
     addingWeight.value = true
     const catId = route.params.id as string
     
+    // 构建请求数据，确保字段名匹配后端
+    const requestData = {
+      date: weightForm.record_date,  // 后端期望 date 字段
+      weight: weightForm.weight,
+      note: weightForm.note
+    }
+    
     if (editingWeightId.value) {
       // 编辑模式
-      await weightApi.updateRecord(editingWeightId.value, weightForm)
+      await weightApi.updateRecord(editingWeightId.value, requestData)
       ElMessage.success('更新成功')
     } else {
       // 新增模式
       await weightApi.addRecord({
         cat_id: Number(catId),
-        ...weightForm
+        ...requestData
       })
       ElMessage.success('添加成功')
     }
@@ -706,9 +826,130 @@ async function deletePhoto(index: number) {
   }
 }
 
+// ==================== 导入导出功能 ====================
+
+// 下载模板
+async function handleDownloadTemplate() {
+  try {
+    const userId = localStorage.getItem('userId')
+    if (!userId) {
+      ElMessage.error('请先登录')
+      return
+    }
+    
+    const response = await weightApi.downloadTemplate(Number(userId))
+    
+    // 创建下载链接
+    const blob = new Blob([response as any], { 
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
+    })
+    const url = window.URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = 'weight_template.xlsx'
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    window.URL.revokeObjectURL(url)
+    
+    ElMessage.success('模板下载成功')
+  } catch (error) {
+    ElMessage.error('下载模板失败')
+  }
+}
+
+// 导入前验证
+function beforeImportUpload(file: File) {
+  const isExcel = file.name.endsWith('.xlsx') || file.name.endsWith('.xls')
+  if (!isExcel) {
+    ElMessage.error('请上传 Excel 文件 (.xlsx 或 .xls)')
+    return false
+  }
+  const isLt10M = file.size / 1024 / 1024 < 10
+  if (!isLt10M) {
+    ElMessage.error('文件大小不能超过 10MB')
+    return false
+  }
+  return true
+}
+
+// 导入体重数据
+async function handleImportWeights(options: any) {
+  try {
+    const userId = localStorage.getItem('userId')
+    if (!userId) {
+      ElMessage.error('请先登录')
+      return
+    }
+    
+    const response = await weightApi.importWeights(Number(userId), options.file)
+    
+    ElMessage.success(response.message || '导入成功')
+    
+    // 如果有错误信息，显示详情
+    if (response.errors && response.errors.length > 0) {
+      ElMessageBox.alert(
+        response.errors.join('\n') + (response.error_count > 10 ? `\n...还有 ${response.error_count - 10} 条错误` : ''),
+        '导入警告',
+        { type: 'warning' }
+      )
+    }
+    
+    // 刷新体重记录
+    loadWeightRecords()
+  } catch (error: any) {
+    const errorMsg = error.response?.data?.detail || '导入失败'
+    ElMessage.error(errorMsg)
+  }
+}
+
+// 导出体重数据
+async function handleExportWeights() {
+  try {
+    const userId = localStorage.getItem('userId')
+    if (!userId) {
+      ElMessage.error('请先登录')
+      return
+    }
+    
+    const catId = route.params.id as string
+    
+    const response = await weightApi.exportWeights(Number(userId), [Number(catId)])
+    
+    // 创建下载链接
+    const blob = new Blob([response as any], { 
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
+    })
+    const url = window.URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19)
+    link.download = `weight_export_${timestamp}.xlsx`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    window.URL.revokeObjectURL(url)
+    
+    ElMessage.success('导出成功')
+  } catch (error: any) {
+    const errorMsg = error.response?.data?.detail || '导出失败'
+    ElMessage.error(errorMsg)
+  }
+}
+
 function goBack() {
   router.push('/dashboard')
 }
+
+// 监听 tab 切换，当切换到体重记录页签时重新渲染图表
+watch(activeTab, (newTab) => {
+  if (newTab === 'weight') {
+    // 使用 setTimeout 确保 DOM 已完全渲染
+    setTimeout(() => {
+      renderWeightChart()
+    }, 100)
+  }
+})
 
 onMounted(() => {
   loadCatDetail()
@@ -829,6 +1070,16 @@ onMounted(() => {
 
 .weight-header h3 {
   margin: 0;
+}
+
+.weight-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.inline-upload {
+  display: inline-block;
 }
 
 .weight-chart {

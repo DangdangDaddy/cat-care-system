@@ -54,9 +54,9 @@
                   <span>绝育：</span>
                   <span>{{ cat.neutered ? '已绝育' : '未绝育' }}</span>
                 </p>
-                <p v-if="cat.color">
-                  <span>毛色：</span>
-                  <span>{{ cat.color }}</span>
+                <p v-if="cat.deworming_date">
+                  <span>驱虫：</span>
+                  <span>{{ formatDeworming(cat.deworming_date) }}</span>
                 </p>
                 <p v-if="cat.vaccination_status">
                   <span>疫苗：</span>
@@ -123,42 +123,82 @@
         </el-form-item>
         
         <el-form-item label="品种" prop="breed">
-          <el-select v-model="catForm.breed" placeholder="请选择品种" style="width: 100%">
-            <el-option label="英短蓝猫" value="英短蓝猫" />
-            <el-option label="英短金渐层" value="英短金渐层" />
-            <el-option label="英短银渐层" value="英短银渐层" />
-            <el-option label="美短虎斑" value="美短虎斑" />
-            <el-option label="美短起司猫" value="美短起司猫" />
-            <el-option label="橘猫" value="橘猫" />
+          <el-select 
+            v-model="catForm.breed" 
+            placeholder="请选择品种" 
+            style="width: 100%"
+            @change="handleBreedChange"
+          >
+            <el-option label="英国短毛猫" value="英国短毛猫" />
+            <el-option label="美国短毛猫" value="美国短毛猫" />
             <el-option label="布偶猫" value="布偶猫" />
-            <el-option label="暹罗猫" value="暹罗猫" />
             <el-option label="缅因猫" value="缅因猫" />
             <el-option label="波斯猫" value="波斯猫" />
-            <el-option label="折耳猫" value="折耳猫" />
-            <el-option label="加菲猫" value="加菲猫" />
-            <el-option label="无毛猫（斯芬克斯）" value="无毛猫" />
-            <el-option label="田园猫（狸花猫）" value="田园猫" />
-            <el-option label="其他品种" value="其他" />
+            <el-option label="加菲猫（异国短毛猫）" value="加菲猫" />
+            <el-option label="孟加拉豹猫" value="孟加拉豹猫" />
+            <el-option label="斯芬克斯猫（无毛猫）" value="斯芬克斯猫" />
+            <el-option label="挪威森林猫" value="挪威森林猫" />
+            <el-option label="德文卷毛猫" value="德文卷毛猫" />
+            <el-option label="俄罗斯蓝猫" value="俄罗斯蓝猫" />
+            <el-option label="阿比西尼亚猫" value="阿比西尼亚猫" />
+            <el-option label="苏格兰折耳猫" value="苏格兰折耳猫" />
+            <el-option label="曼基康猫（矮脚猫）" value="曼基康猫" />
+            <el-option label="拿破仑猫（矮脚长毛猫）" value="拿破仑猫" />
+            <el-option label="西伯利亚猫" value="西伯利亚猫" />
+            <el-option label="索马里猫" value="索马里猫" />
+            <el-option label="暹罗猫" value="暹罗猫" />
+            <el-option label="金吉拉猫" value="金吉拉猫" />
+            <el-option label="中国狸花猫" value="中国狸花猫" />
+            <el-option label="中华田园猫" value="中华田园猫" />
+            <el-option label="其他（支持手工录入）" value="其他" />
           </el-select>
+          <el-input 
+            v-if="catForm.breed === '其他'" 
+            v-model="catForm.breed_custom" 
+            placeholder="请输入品种名称"
+            style="margin-top: 8px;"
+          />
         </el-form-item>
         
         <el-form-item label="毛色" prop="color">
-          <el-select v-model="catForm.color" placeholder="请选择毛色" style="width: 100%">
+          <el-select 
+            v-model="catForm.color" 
+            placeholder="请选择毛色" 
+            style="width: 100%"
+            @change="handleColorChange"
+          >
             <el-option label="白色" value="白色" />
             <el-option label="黑色" value="黑色" />
-            <el-option label="灰色/蓝灰色" value="灰色" />
-            <el-option label="橘色/黄色" value="橘色" />
-            <el-option label="虎斑纹" value="虎斑纹" />
-            <el-option label="三花（白+黑+橘）" value="三花" />
-            <el-option label="玳瑁色" value="玳瑁色" />
-            <el-option label="奶牛猫（黑白）" value="奶牛猫" />
-            <el-option label="重点色（暹罗色）" value="重点色" />
-            <el-option label="金渐层" value="金渐层" />
-            <el-option label="银渐层" value="银渐层" />
+            <el-option label="蓝色" value="蓝色" />
+            <el-option label="红色" value="红色" />
             <el-option label="奶油色" value="奶油色" />
-            <el-option label="巧克力色/棕色" value="巧克力色" />
-            <el-option label="其他颜色" value="其他" />
+            <el-option label="巧克力色" value="巧克力色" />
+            <el-option label="银渐层" value="银渐层" />
+            <el-option label="金渐层" value="金渐层" />
+            <el-option label="蓝金渐层" value="蓝金渐层" />
+            <el-option label="蓝银渐层" value="蓝银渐层" />
+            <el-option label="银虎斑" value="银虎斑" />
+            <el-option label="金虎斑" value="金虎斑" />
+            <el-option label="棕虎斑" value="棕虎斑" />
+            <el-option label="蓝虎斑" value="蓝虎斑" />
+            <el-option label="红虎斑" value="红虎斑" />
+            <el-option label="海豹重点色" value="海豹重点色" />
+            <el-option label="蓝重点色" value="蓝重点色" />
+            <el-option label="巧克力重点色" value="巧克力重点色" />
+            <el-option label="火焰重点色" value="火焰重点色" />
+            <el-option label="玳瑁色" value="玳瑁色" />
+            <el-option label="三花色" value="三花色" />
+            <el-option label="双色" value="双色" />
+            <el-option label="烟色" value="烟色" />
+            <el-option label="纯色" value="纯色" />
+            <el-option label="其他（支持手工录入）" value="其他" />
           </el-select>
+          <el-input 
+            v-if="catForm.color === '其他'" 
+            v-model="catForm.color_custom" 
+            placeholder="请输入毛色名称"
+            style="margin-top: 8px;"
+          />
         </el-form-item>
         
         <el-form-item label="生日" prop="birth_date">
@@ -219,7 +259,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, onUnmounted, computed } from 'vue'
+import { ref, reactive, onMounted, onUnmounted, computed, nextTick, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { StarFilled, Plus, TrendCharts, SwitchButton, PictureFilled } from '@element-plus/icons-vue'
@@ -249,13 +289,29 @@ const catForm = reactive({
   name: '',
   gender: 'male',
   breed: '',
+  breed_custom: '',  // 自定义品种
   color: '',
+  color_custom: '',  // 自定义毛色
   birth_date: '',
   neutered: false,
   vaccination_status: '',
   deworming_date: '',
   medical_history: ''
 })
+
+// 品种选择变化处理
+function handleBreedChange(value: string) {
+  if (value !== '其他') {
+    catForm.breed_custom = ''
+  }
+}
+
+// 毛色选择变化处理
+function handleColorChange(value: string) {
+  if (value !== '其他') {
+    catForm.color_custom = ''
+  }
+}
 
 const catRules = {
   name: [{ required: true, message: '请输入猫咪名字', trigger: 'blur' }],
@@ -298,38 +354,38 @@ const shuffledPhotos = computed(() => {
   return photos
 })
 
-// 品种智能匹配展示
+// 品种和毛色展示（空格分隔）
 function getBreedDisplay(breed: string, color: string | undefined): string {
   if (!breed) return '未知品种'
   
-  const breedColorMap: Record<string, Record<string, string>> = {
-    '英短蓝猫': { '灰色': '英短蓝猫', '默认': '英短蓝猫' },
-    '英短金渐层': { '金渐层': '英短金渐层', '默认': '英短金渐层' },
-    '英短银渐层': { '银渐层': '英短银渐层', '默认': '英短银渐层' },
-    '美短虎斑': { '虎斑纹': '美短虎斑', '默认': '美短虎斑' },
-    '美短起司猫': { '奶牛猫': '美短起司', '默认': '美短起司猫' },
-    '橘猫': { '橘色': '橘猫', '默认': '橘猫' },
-    '布偶猫': { '重点色': '布偶猫', '奶油色': '布偶猫', '默认': '布偶猫' },
-    '暹罗猫': { '重点色': '暹罗猫', '默认': '暹罗猫' },
-    '田园猫': {
-      '橘色': '橘猫（田园）',
-      '虎斑纹': '狸花猫',
-      '三花': '三花猫',
-      '玳瑁色': '玳瑁猫',
-      '奶牛猫': '奶牛猫',
-      '默认': '田园猫'
-    }
-  }
-  
-  if (breedColorMap[breed] && color && breedColorMap[breed][color]) {
-    return breedColorMap[breed][color]
-  }
-  
+  // 如果有毛色，显示 品种 毛色（空格分隔）
   if (color && color !== '其他') {
-    return `${breed}（${color}）`
+    return `${breed} ${color}`
   }
   
+  // 如果没有毛色或毛色是"其他"，只显示品种
   return breed
+}
+
+// 格式化驱虫日期
+function formatDeworming(dateStr: string): string {
+  if (!dateStr) return '未记录'
+  
+  const dewormDate = new Date(dateStr)
+  const today = new Date()
+  const diffDays = Math.floor((today.getTime() - dewormDate.getTime()) / (1000 * 60 * 60 * 24))
+  
+  if (diffDays < 0) {
+    return '未记录'
+  } else if (diffDays === 0) {
+    return '今天'
+  } else if (diffDays < 30) {
+    return `${diffDays}天前`
+  } else if (diffDays < 90) {
+    return `${Math.floor(diffDays / 30)}个月前`
+  } else {
+    return `${Math.floor(diffDays / 30)}个月前 ⚠️`
+  }
 }
 
 // 疫苗状态样式
@@ -372,7 +428,13 @@ async function loadChart() {
     if (!userId) return
     const res = await weightApi.getChartData(userId)
     
-    if (!chartRef.value) return
+    // 使用 nextTick 确保 DOM 已渲染
+    await nextTick()
+    
+    if (!chartRef.value) {
+      console.log('Chart container not ready')
+      return
+    }
     
     const existingChart = echarts.getInstanceByDom(chartRef.value)
     if (existingChart) {
@@ -445,6 +507,7 @@ async function loadChart() {
     const handleResize = () => chart.resize()
     window.addEventListener('resize', handleResize)
   } catch (error) {
+    console.error('加载图表失败:', error)
     ElMessage.error('加载图表失败')
   }
 }
@@ -455,10 +518,18 @@ async function handleAddCat() {
     addingCat.value = true
     const userId = Number(localStorage.getItem('userId'))
     
-    await catApi.addCat({
+    // 处理自定义品种和毛色
+    const submitData = {
       ...catForm,
-      user_id: userId
-    })
+      user_id: userId,
+      breed: catForm.breed === '其他' ? catForm.breed_custom : catForm.breed,
+      color: catForm.color === '其他' ? catForm.color_custom : catForm.color
+    }
+    // 移除临时字段
+    delete (submitData as any).breed_custom
+    delete (submitData as any).color_custom
+    
+    await catApi.addCat(submitData)
     
     ElMessage.success('添加成功')
     showAddDialog.value = false
@@ -467,7 +538,9 @@ async function handleAddCat() {
     catForm.name = ''
     catForm.gender = 'male'
     catForm.breed = ''
+    catForm.breed_custom = ''
     catForm.color = ''
+    catForm.color_custom = ''
     catForm.birth_date = ''
     catForm.neutered = false
     catForm.vaccination_status = ''
@@ -491,6 +564,13 @@ function handleLogout() {
   userStore.logout()
   router.push('/login')
 }
+
+// 监听 tab 切换，当切换到猫咪页签时重新渲染图表
+watch(activeTab, (newTab) => {
+  if (newTab === 'cats') {
+    loadChart()
+  }
+})
 
 onMounted(() => {
   loadCats()
@@ -643,22 +723,22 @@ onMounted(() => {
   align-items: center;
   justify-content: center;
   min-height: 200px;
-  background: rgba(102, 126, 234, 0.1);
-  border: 2px dashed #667eea;
+  background: #fafafa;
+  border: 1px dashed #dcdfe6;
   border-radius: 16px;
   cursor: pointer;
   transition: all 0.3s ease;
-  color: #667eea;
+  color: #909399;
 }
 
 .add-cat-card:hover {
-  background: rgba(102, 126, 234, 0.2);
-  transform: scale(1.02);
+  border-color: #c0c4cc;
+  color: #606266;
 }
 
 .add-cat-card .icon {
-  font-size: 48px;
-  margin-bottom: 12px;
+  font-size: 32px;
+  margin-bottom: 8px;
 }
 
 .chart-section {

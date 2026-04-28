@@ -51,18 +51,69 @@ export const catApi = {
     api.get(`/cats/${catId}`),
   createCat: (userId: number, data: any) => 
     api.post('/cats/', data, { params: { user_id: userId } }),
+  addCat: (data: any) => 
+    api.post('/cats/', data, { params: { user_id: data.user_id } }),
   updateCat: (catId: number, data: any) => 
     api.put(`/cats/${catId}`, data),
   deleteCat: (catId: number) => 
-    api.delete(`/cats/${catId}`)
+    api.delete(`/cats/${catId}`),
+  uploadAvatar: (catId: number, formData: FormData) => 
+    api.post(`/cats/${catId}/avatar`, formData, { 
+      headers: { 'Content-Type': 'multipart/form-data' } 
+    }),
+  uploadPhoto: (catId: number, formData: FormData) => 
+    api.post(`/cats/${catId}/photos`, formData, { 
+      headers: { 'Content-Type': 'multipart/form-data' } 
+    }),
+  updatePhotos: (catId: number, photos: string[]) => 
+    api.put(`/cats/${catId}/photos`, { photos })
 }
 
 // 体重相关
 export const weightApi = {
+  // 获取猫咪体重记录列表
   getWeights: (catId: number) => 
     api.get(`/cats/${catId}/weights`),
+  // 兼容旧方法名
+  getRecords: (catId: number) => 
+    api.get(`/cats/${catId}/weights`),
+  // 添加体重记录
   addWeight: (catId: number, data: any) => 
     api.post(`/cats/${catId}/weights`, data),
+  // 兼容旧方法名
+  addRecord: (data: any) => 
+    api.post(`/cats/${data.cat_id}/weights`, data),
+  // 更新体重记录
+  updateRecord: (weightId: number, data: any) => 
+    api.put(`/weights/${weightId}`, data),
+  // 删除体重记录
+  deleteRecord: (weightId: number) => 
+    api.delete(`/weights/${weightId}`),
+  // 获取图表数据
   getChartData: (userId: number) => 
-    api.get('/weights/chart', { params: { user_id: userId } })
+    api.get('/weights/chart', { params: { user_id: userId } }),
+  // 导入导出功能
+  downloadTemplate: (userId: number) => 
+    api.get('/weights/template', { 
+      params: { user_id: userId },
+      responseType: 'blob'
+    }),
+  importWeights: (userId: number, file: File) => {
+    const formData = new FormData()
+    formData.append('file', file)
+    return api.post('/weights/import', formData, { 
+      params: { user_id: userId },
+      headers: { 'Content-Type': 'multipart/form-data' }
+    })
+  },
+  exportWeights: (userId: number, catIds?: number[]) => {
+    const params: any = { user_id: userId }
+    if (catIds && catIds.length > 0) {
+      params.cat_ids = catIds.join(',')
+    }
+    return api.get('/weights/export', { 
+      params,
+      responseType: 'blob'
+    })
+  }
 }
