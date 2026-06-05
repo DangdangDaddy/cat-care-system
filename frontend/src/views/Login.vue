@@ -12,6 +12,7 @@
             placeholder="用户名" 
             size="large"
             :prefix-icon="User"
+            @input="clearError"
           />
         </el-form-item>
         <el-form-item prop="password">
@@ -22,8 +23,17 @@
             size="large"
             :prefix-icon="Lock"
             show-password
+            @input="clearError"
           />
         </el-form-item>
+        <el-alert
+          v-if="errorMessage"
+          class="login-error"
+          :title="errorMessage"
+          type="error"
+          show-icon
+          :closable="false"
+        />
         <el-form-item>
           <el-button 
             type="primary" 
@@ -46,16 +56,15 @@
 
 <script setup lang="ts">
 import { ref, reactive } from 'vue'
-import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { User, Lock } from '@element-plus/icons-vue'
 import { authApi } from '../api'
 import { useUserStore } from '../stores/user'
 
-const router = useRouter()
 const userStore = useUserStore()
 const formRef = ref()
 const loading = ref(false)
+const errorMessage = ref('')
 
 const form = reactive({
   username: '',
@@ -67,7 +76,12 @@ const rules = {
   password: [{ required: true, message: '请输入密码', trigger: 'blur' }]
 }
 
+function clearError() {
+  errorMessage.value = ''
+}
+
 async function handleLogin() {
+  errorMessage.value = ''
   await formRef.value.validate()
   loading.value = true
   
@@ -78,9 +92,16 @@ async function handleLogin() {
     // 强制刷新页面跳转
     window.location.href = '/dashboard'
   } catch (error: any) {
-    ElMessage.error(error.response?.data?.detail || '登录失败')
+    errorMessage.value = error.response?.data?.detail || '登录失败，请稍后重试'
+    ElMessage.error(errorMessage.value)
   } finally {
     loading.value = false
   }
 }
 </script>
+
+<style scoped>
+.login-error {
+  margin-bottom: 18px;
+}
+</style>

@@ -39,6 +39,24 @@ Thumbs.db
 logs/
 *.log
 
+# Runtime artifacts and local data
+artifacts/
+*.ab
+*.tar
+*.backup-*
+test_cat_care.db
+backend/test_cat_care.db
+backend/test_*.db
+backend/*.db.backup-*
+backend/static/photos/
+backend/static/thumbnails/
+frontend/test-results/
+frontend/playwright-report/
+
+# Local third-party sync lab. Keep these out of public GitHub until reviewed.
+docs/siipet-*.md
+tools/siipet/
+
 # Build
 dist/
 build/
